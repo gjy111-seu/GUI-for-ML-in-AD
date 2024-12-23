@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vue App</title>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: top;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+  }
+  #app {
+    background: #54999e;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+  }
+  .input-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+  }
+  .input-row1 {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .input-field {
+    font-size: 12px;
+    margin-right: 10px;
+    padding: 4px;
+    width: 100%;
+    max-width: calc(33% - 10px);
+    color: gray;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+
+  .input-field1 {
+    width: 175px;
+    font-size: 12px;
+    margin-right: 10px;
+    padding: 4px;
+    max-width: calc(33% - 10px);
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: skyblue;
+  }
+  .output {
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .output>span {
+    display: inline-block;
+    width: 25%;
+    height: 30px;
+    border: 1px solid gray;
+    margin: 5px;
+  }
+  .top {
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+  }
+
+  .inp {
+    width: 200px;
+    margin-right: 15px;
+    font-size: 20px;
+  }
+  .btn {
+    width: 150px;
+    height: 40px;
+    background-color: #54999e;
+    color: #a8cdac;
+    border: 1px solid #b0e4b5;
+    font-size: 20px;
+  }
+  .body {
+    background-color: #fce4d8;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid gray;
+  }
+  .btn-style {
+    width: 97%;
+    background-color: #54999e;
+    color: #a8cdac;
+    margin: 10px;
+    border: 1px solid #b0e4b5;
+    font-size: 20px;
+  }
+  .btm {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .btm-box {
+    padding: 10px;
+    margin: 20px;
+    text-align: center;
+    background-color: #fce4d8;
+  }
+
+  .btm-box>input {
+    height: 25px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h2 style="text-align: center;">Prediction of performance of biochar-mediated anaerobic digestion</h2>
+  <div style="text-align: center;font-size: 20px;">Input features</div>
+  <div class="top">
+    <input class="inp" placeholder="Input feature file"/>
+    <button  class="btn">P I C K</button>
+  </div>
+  <div class="body">
+    <div v-for="row in 3" :key="row" class="input-row">
+      <input v-for="col in 4" :key="col" v-model="inputs[row * 4 + col - 4]"  type="text" class="input-field"  :placeholder="instr[row * 4 + col - 4]"/>
+    </div>
+    <div class="input-row1">
+      <input type="text" class="input-field1" v-model="inputs[13]" :placeholder="instr[13]"/>
+      <input type="text" class="input-field1" v-model="inputs[14]" :placeholder="instr[14]"/>
+    </div>
+  </div>
+  <button @click="sendData" class="btn-style">PREDICTION</button>
+  <div style="text-align: center;font-size: 20px;">Output targets</div>
+  <div class="btm" v-for="row in 3" :key="row" >
+    <div class="btm-box">
+      <div>{{Bstr[row]}}</div>
+      <input :placeholder="Bplace[row]" v-model="A[row]" style="text-align: center;"  @blur="handleBlur(row)"/>
+    </div>
+    <div class="btm-box">
+      <div>{{Astr[row]}}</div>
+      <input :placeholder="Aplace[row]" v-model="B[row]" style="text-align: center;"/>
+    </div>
+    <div class="btm-box">
+      <div>{{Cstr[row]}}</div>
+      <input :placeholder="Cplace[row]" v-model="C[row]" style="text-align: center;"/>
+    </div>
+  </div>
+  <button class="btn-style">EXIT</button>
+</div>
+
+<script>
+const vm = new Vue({
+  el: '#app',
+  data: {
+    inputs: new Array(23).join('.').split('.'), // 创建23个空字符串元素的数组,
+    instr: ['','Specific surface area (m2/g)',
+          'Average pore diameter (nm)','pH (Biochar)','Electricity conductivity (uS/cm)',
+          'Particle size (nm)','Carbon (%)','Hydrogen (%)','Oxygen (%)','Nitrogen (%)',
+          'VS/TS','Inoculation ratio (VS/VS )','Biochar dose (g/L)',
+          'Temperature (AD,°C)','Initial pH (AD)'],
+    A: [],
+    Astr: ['','Predicted biomethane yield','Predicted growth rate','Predicted lag-phase time'],
+    Aplace: ['','BMY (mL/g VS)','ICR','λ(day)'],
+    B: [],
+    Bstr:['','Actual biomethane yield','Actual growth rate','Actual lag-phase time'],
+    Bplace: ['','BMY (mL/g VS)','ICR','λ(day)'],
+    C: [],
+    Cstr:['','Predicted error (BMY)','Predicted error (ICR)','Predicted error (λ)'],
+    Cplace:['','Predicted error (%)','Predicted error (%)','Predicted error (%)'],
+  },
+  methods: {
+    handleBlur(row){
+      let value= (this.A[row] - this.B[row]) / this.B[row];
+      vm.$set(this.C, row, value);
+    },
+    sendData() {
+      const dataToSend = this.inputs.slice(0, 23);
+      axios.post('http://127.0.0.1:5000', { data: dataToSend })
+        .then(response => {
+          vm.$set(this.B, 1, response.data[0]);
+          vm.$set(this.B, 2, response.data[1]);
+          vm.$set(this.B, 3, response.data[2]);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Handle error
+        });
+    },
+  },
+});
+</script>
+</body>
+</html>
