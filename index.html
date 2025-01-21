@@ -170,7 +170,7 @@
 const vm = new Vue({
   el: '#app',
   data: {
-    inputs: new Array(23).join('.').split('.'), // 创建23个空字符串元素的数组,
+    inputs: new Array(23).join('.').split('.'), // 
     instr: ['','Specific surface area (m2/g)',
           'Average pore diameter (nm)','pH (Biochar)','Electricity conductivity (uS/cm)',
           'Particle size (nm)','Carbon (%)','Hydrogen (%)','Oxygen (%)','Nitrogen (%)',
@@ -178,12 +178,12 @@ const vm = new Vue({
           'Temperature (AD,°C)','Initial pH (AD)'],
     A: [],
     Astr: ['','Predicted biomethane yield','Predicted growth rate','Predicted lag-phase time'],
-    Aplace: ['','BMY (mL/g VS)','ICR','λ(day)'],
+    Aplace: ['','BMY (mL/g VS)','IR','λ(day)'],
     B: [],
     Bstr:['','Actual biomethane yield','Actual growth rate','Actual lag-phase time'],
-    Bplace: ['','BMY (mL/g VS)','ICR','λ(day)'],
+    Bplace: ['','BMY (mL/g VS)','IR','λ(day)'],
     C: [],
-    Cstr:['','Predicted error (BMY)','Predicted error (ICR)','Predicted error (λ)'],
+    Cstr:['','Predicted error (BMY)','Predicted error (IR)','Predicted error (λ)'],
     Cplace:['','Predicted error (%)','Predicted error (%)','Predicted error (%)'],
   },
   methods: {
