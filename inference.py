@@ -7,7 +7,7 @@ from flask import Flask, request
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # 允许所有来源的跨域请求
+CORS(app)  
 
 
 def model_save_load(model_path):
@@ -24,11 +24,11 @@ def model_save_load(model_path):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    data_get = request.get_json()  # 获取JSON数据
+    data_get = request.get_json()  
     data_list = data_get['data']
     print(data_list)
     data = {
-        'SSA': [float(data_list[1])],  # 示例数据，你可以根据需要添加更多数据
+        'SSA': [float(data_list[1])],  
         'APD': [float(data_list[2])],
         'pH1': [float(data_list[3])],
         'EC': [float(data_list[4])],
